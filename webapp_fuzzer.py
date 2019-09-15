@@ -16,8 +16,8 @@ def get_paths(directory, filters=None):
             file_path = "%s/%s" % (r, f)
             if file_path.startswith("."):
                 file_path = file_path[1:]
-            if os.path.splitext(files)[1] not in filters:
-                paths.put(file_path)
+            if os.path.splitext(f)[1] not in filters:
+                paths.append(file_path)
 
     return paths
 
@@ -37,14 +37,12 @@ def test_remote(url_queue, fail_codes=None, success_codes=None):
                 continue
 
         # Resource exists
-        print("[{code}] => {url}")
+        print(f"[{code}] => {url}")
 
 
 def main():
 
-    target = args.target
-    if not target.endswith("/"):
-        target += "/"
+    target = args.target.strip("/")
     directory = args.directory
 
     # What we're looking for (and not)
@@ -66,11 +64,7 @@ def main():
         print("Spawning thread: %d" % i)    # temporary
         t = threading.Thread(
             target=test_remote,
-            args=url_queue,
-            kwargs={
-                "fail_codes": fail_codes,
-                "success_codes": success_codes
-            }
+            args=(url_queue, fail_codes, success_codes)
         )
         t.start()
 
